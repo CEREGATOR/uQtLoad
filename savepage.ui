@@ -14,28 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>?????</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLineEdit" name="pathSaveLine"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="openButton">
-       <property name="text">
-        <string>Open</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -48,22 +27,10 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-      </font>
-     </property>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Save Qt</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <string>?????</string>
      </property>
     </widget>
    </item>
@@ -79,6 +46,46 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="pathSaveLine"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openButton">
+       <property name="text">
+        <string>Open</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Save Qt</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

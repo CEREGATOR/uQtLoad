@@ -17,6 +17,9 @@ public:
     ~SavePage();
     QString getPathSave(){return pathSave_;}
 
+public slots:
+    void setProgress(qint64 bytesRead,qint64 totalBytes);
+
 private slots:
     void selectPath();
 

@@ -19,8 +19,10 @@ public:
 
 signals:
     void onReady();
+    void s_setValueProgress(qint64 bytesRead,qint64 totalBytes);
 
 public slots:
+    void updateDownloadProgress(qint64 bytesRead, qint64 totalBytes);
     void getData();
     void onResult(QNetworkReply *reply);
     void setPath(QString path)
@@ -31,6 +33,7 @@ public slots:
 private:
     QString savePath;
     QNetworkAccessManager *manager;
+    QNetworkReply *reply;
 };
 
 #endif // DOWNLOADER_H

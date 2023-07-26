@@ -12,23 +12,25 @@ Downloader::Downloader(QObject *parent) : QObject(parent)
     proxy.setHostName("proxy.olvs.miee.ru");
     proxy.setPort(8080);
 
-    manager->setProxy(proxy);
+//    manager->setProxy(proxy);
     connect(manager, &QNetworkAccessManager::finished, this, &Downloader::onResult);
 }
 
 void Downloader::getData()
 {
-    QString zip = "https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qtserialport-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z";
+    QString zip = "https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qtbase-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z";
     QUrl url(zip);
     QFileInfo fileInfo(url.path());
     savePath+="/"+fileInfo.fileName();
     qDebug() << savePath;
     qDebug() << QSslSocket::supportsSsl() << QSslSocket::sslLibraryBuildVersionString() << QSslSocket::sslLibraryVersionString();
 
-
     QNetworkRequest request;
     request.setUrl(url);
-    manager->get(request);
+    reply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
+    reply = manager->get(request);
+
+    connect(reply,&QNetworkReply::downloadProgress,this,&Downloader::s_setValueProgress);
 }
 
 void Downloader::onResult(QNetworkReply *reply)
@@ -49,4 +51,8 @@ void Downloader::onResult(QNetworkReply *reply)
         emit onReady(); // Sends a signal to the completion of the receipt of the file
         }
     }
+}
+
+void Downloader::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)
+{
 }
