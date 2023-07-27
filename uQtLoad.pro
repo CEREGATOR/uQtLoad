@@ -57,7 +57,5 @@ FORMS += \
 
 include(q7zip/7z/7zip.pri)
 INCLUDEPATH += q7zip/include
-#LIBS += -Lq7zip/7z -l7z
-#LIBS += -Lq7zip/7z -l7zd
 LIBS += -Lq7zip/lib -lq7z
 

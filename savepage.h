@@ -17,7 +17,6 @@ class SavePage : public QWidget
 public:
     explicit SavePage(QWidget *parent = nullptr);
     ~SavePage();
-    QString getPathSave(){return pathSave_;}
 
 public slots:
     void setProgress(qint64 bytesRead,qint64 totalBytes);
@@ -34,7 +33,7 @@ private:
     size_t curDowload;
     QVector<Downloader*> downloaders;
     QVector<QUrl> urls;
-    QString pathSave_;
+    QString pathSave_ = "";
     Ui::SavePage *ui;
 };
 

@@ -12,7 +12,7 @@ Downloader::Downloader(QObject *parent) : QObject(parent)
     proxy.setHostName("proxy.olvs.miee.ru");
     proxy.setPort(8080);
 
-    manager->setProxy(proxy);
+//    manager->setProxy(proxy);
     manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
     connect(manager, &QNetworkAccessManager::finished, this, &Downloader::onResult);
 }
