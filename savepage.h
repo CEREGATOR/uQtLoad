@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QFileDialog>
+#include <QStandardPaths>
+#include "downloader.h"
 
 namespace Ui {
 class SavePage;
@@ -19,14 +21,19 @@ public:
 
 public slots:
     void setProgress(qint64 bytesRead,qint64 totalBytes);
+    void nextDownload();
 
 private slots:
+    void startDownload();
     void selectPath();
 
 signals:
     void s_prevPage();
 
 private:
+    size_t curDowload;
+    QVector<Downloader*> downloaders;
+    QVector<QUrl> urls;
     QString pathSave_;
     Ui::SavePage *ui;
 };

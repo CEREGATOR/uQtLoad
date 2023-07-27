@@ -1,7 +1,7 @@
 #include "savepage.h"
 #include "ui_savepage.h"
-#include "downloader.h"
-
+#include <q7z_extract.h>
+#include <q7z_facade.h>
 
 SavePage::SavePage(QWidget *parent) :
     QWidget(parent),
@@ -10,33 +10,67 @@ SavePage::SavePage(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->buttonBox,&QDialogButtonBox::rejected,this,&SavePage::s_prevPage);
+    connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&SavePage::startDownload);
 
     connect(ui->openButton,&QPushButton::clicked,this,&SavePage::selectPath);
 
     ui->progressBar->show();
+
+    Q7z::initSevenZ();
 }
 
 void SavePage::selectPath()
 {
     QString pathSave_ = QFileDialog::getExistingDirectory(
                 this,
-                "Путь сохранения",
-                "../");
+                tr("Select folder"),
+                QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     ui->pathSaveLine->setText(pathSave_);
+}
 
-    Downloader* downloader = new Downloader();
+void SavePage::startDownload()
+{
+//    urls.push_back(QUrl("https://w.forfun.com/fetch/db/db6e862725f8e449427d1de5b2be0835.jpeg"));
+    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qtbase-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z"));
+//    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qttools-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z"));
+    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreator.7z"));
+    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreatorcdbext.7z"));
 
-//    connect(downloader,&Downloader::s_setMaxProgress,ui->progressBar,&QProgressBar::setMaximum);
-//    connect(downloader,&Downloader::s_setCurrByte,ui->progressBar,&QProgressBar::setValue);
+    for(size_t i=0;i<urls.size();i++)
+    {
+        downloaders.push_back(new Downloader());
+        connect(downloaders.at(i),&Downloader::s_setValueProgress,this,&SavePage::setProgress);
+        connect(downloaders.at(i),&Downloader::onReady,this,&SavePage::nextDownload);
+    }
+    curDowload = 0;
 
-    downloader->setPath(pathSave_);
+    downloaders.at(curDowload)->getData(ui->pathSaveLine->text(),urls.at(curDowload));
+}
 
-    connect(downloader,&Downloader::s_setValueProgress,this,&SavePage::setProgress);
+void SavePage::nextDownload()
+{
+    QString zippath = ui->pathSaveLine->text()+"/"+urls.at(curDowload).fileName();
 
-    downloader->getData();
+//    QString temp = QDir::tempPath();
 
-//    ui->pathSaveLine->setText(QDir::tempPath());
+    ui->textBrowser->append(tr("Download successfully : %1").arg(zippath));
+
+    QFile source(zippath); // embedded resource
+    source.open(QIODevice::ReadOnly);
+    Q7z::extractArchive(&source, ui->pathSaveLine->text());
+
+    ui->textBrowser->append(tr("Extract successfully : %1").arg(QFileInfo(zippath).completeBaseName()));
+
+    if(curDowload < downloaders.size()-1)
+    {
+        downloaders.at(++curDowload)->getData(ui->pathSaveLine->text(),urls.at(curDowload));
+    }
+    else
+    {
+        ui->textBrowser->append("Finish!");
+    }
 }
 
 void SavePage::setProgress(qint64 bytesRead,qint64 totalBytes)

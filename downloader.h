@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QDebug>
 #include <QFileInfo>
+#include <QDir>
 
 class Downloader : public QObject
 {
@@ -22,16 +23,11 @@ signals:
     void s_setValueProgress(qint64 bytesRead,qint64 totalBytes);
 
 public slots:
-    void updateDownloadProgress(qint64 bytesRead, qint64 totalBytes);
-    void getData();
+    void getData(const QString& savePath, const QUrl& url);
     void onResult(QNetworkReply *reply);
-    void setPath(QString path)
-    {
-        savePath = path;
-    }
 
 private:
-    QString savePath;
+    QString pathSave;
     QNetworkAccessManager *manager;
     QNetworkReply *reply;
 };
