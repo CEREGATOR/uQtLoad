@@ -4,6 +4,10 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QNetworkProxy>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 namespace Ui {
 class ComponentPage;
@@ -42,8 +46,11 @@ private slots:
     void treeItem_checkAllChild(QStandardItem * item, bool check);
     void treeItem_checkAllChild_recursion(QStandardItem * item,bool check);
     Qt::CheckState checkSibling(QStandardItem * item);
+    void pageHTML(QNetworkReply *reply);
 
 private:
+    QNetworkAccessManager *manager;
+    QNetworkReply *reply;
     Ui::ComponentPage *ui;
 };
 

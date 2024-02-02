@@ -49,6 +49,52 @@ ComponentPage::ComponentPage(QWidget *parent) :
 
     connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&ComponentPage::s_nextPage);
     connect(ui->buttonBox,&QDialogButtonBox::rejected,this,&ComponentPage::s_prevPage);
+
+    manager = new QNetworkAccessManager();
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName("proxy.olvs.miee.ru");
+    proxy.setPort(8080);
+
+    manager->setProxy(proxy);
+    manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
+
+    reply = manager->get(QNetworkRequest(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/")));
+    QEventLoop event;
+    connect(reply,SIGNAL(finished()),&event,SLOT(quit()));
+    event.exec();
+    pageHTML(reply);
+}
+
+void ComponentPage::pageHTML(QNetworkReply *reply)
+{
+    QString buff = reply->readAll();
+    QStringList listHref;
+    QRegExp hrefRegExp("<a href=\"([^\"?\/]+.7z)\"");
+
+    int lastPos = 0;
+    while ((lastPos = hrefRegExp.indexIn(buff, lastPos)) != -1) {
+        lastPos += hrefRegExp.matchedLength();
+//        qDebug() << hrefRegExp.cap(1);
+        listHref.push_back(hrefRegExp.cap(1));
+    }
+    listHref.removeDuplicates();
+
+    QRegExp versRegExp("(\\d+\\.\\d+\\.\\d+)\\-(\\d+)\\-(\\d+)(\\w+)");
+    foreach( QString str, listHref ) {
+    qDebug() << str;
+    lastPos = 0;
+    while ((lastPos = versRegExp.indexIn(str, lastPos)) != -1) {
+        lastPos += versRegExp.matchedLength();
+//        qDebug() << versRegExp.cap(0);
+        qDebug() << versRegExp.cap(1); // version
+        qDebug() << versRegExp.cap(2);
+        qDebug() << versRegExp.cap(3); // date
+        qDebug() << versRegExp.cap(4); //name tool
+//        listHref.push_back(versRegExp.cap(1));
+    }
+    }
+
 }
 
 Qt::CheckState ComponentPage::checkSibling(QStandardItem * item)
