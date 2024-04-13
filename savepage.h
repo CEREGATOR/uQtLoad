@@ -21,6 +21,10 @@ public:
 public slots:
     void setProgress(qint64 bytesRead,qint64 totalBytes);
     void nextDownload();
+    void setUrls(QVector<QUrl> v_urls)
+    {
+        urls = v_urls;
+    }
 
 private slots:
     void startDownload();

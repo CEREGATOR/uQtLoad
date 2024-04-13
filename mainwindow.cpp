@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->setWindowTitle(QString("uQtLoad"));
+    this->setWindowTitle(QString(tr("uQtLoad")));
 
     connect(ui->componentWidget,&ComponentPage::s_nextPage,this,[=](){ui->stackedWidget->setCurrentIndex(CURR_PAGE+1);});
     connect(ui->componentWidget,&ComponentPage::s_prevPage,this,[=](){ui->stackedWidget->setCurrentIndex(CURR_PAGE-1);});
@@ -19,6 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->mirrorWidget,&MirrorSettings::s_closeApp,this,[=](){this->close();});
     connect(ui->mirrorWidget,&MirrorSettings::s_nextPage,this,[=](){ui->stackedWidget->setCurrentIndex(CURR_PAGE+1);});
+
+    connect(ui->componentWidget,&ComponentPage::s_setUrls,ui->saveWidget,&SavePage::setUrls);
+
+    ui->retranslateUi(this);
 }
 
 

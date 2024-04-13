@@ -9,6 +9,8 @@ SavePage::SavePage(QWidget *parent) :
 {
     ui->setupUi(this);
 
+//    ui->label->setText(tr("Save Qt"));
+
     connect(ui->buttonBox,&QDialogButtonBox::rejected,this,&SavePage::s_prevPage);
     connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&SavePage::startDownload);
 
@@ -38,10 +40,10 @@ void SavePage::startDownload()
     ui->textBrowser->append(tr("Start dowload"));
 
 //    urls.push_back(QUrl("https://w.forfun.com/fetch/db/db6e862725f8e449427d1de5b2be0835.jpeg"));
-    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qtbase-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z"));
+//    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qtbase-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z"));
 //    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/5.15.2-0-202011130602qttools-Windows-Windows_10-MSVC2019-Windows-Windows_10-X86.7z"));
-    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreator.7z"));
-    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreatorcdbext.7z"));
+//    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreator.7z"));
+//    urls.push_back(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreatorcdbext.7z"));
 
     for(size_t i=0;i<urls.size();i++)
     {
@@ -75,7 +77,7 @@ void SavePage::nextDownload()
     }
     else
     {
-        ui->textBrowser->append("Finish!");
+        ui->textBrowser->append(tr("Finish!"));
     }
 }
 

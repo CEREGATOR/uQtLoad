@@ -1,5 +1,6 @@
 #include "componentpage.h"
 #include "ui_componentpage.h"
+#include <QTranslator>
 
 ComponentPage::ComponentPage(QWidget *parent) :
     QWidget(parent),
@@ -7,9 +8,14 @@ ComponentPage::ComponentPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
+//    ui->label->setText(tr("Select Components"));
+//    ui->label_2->setText(tr("Select the components to install. Deselect components to unistall them. Any components already installed will not be used."));
+
     QStandardItemModel* model = new QStandardItemModel(ui->treeView);
 
-    model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("Component Name")<<QStringLiteral("Version"));
+//    model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("Component Name")<<QStringLiteral("Version"));
+
+    model->setHorizontalHeaderLabels(QStringList()<<tr("Component Name")<<tr("Version"));
 
     QStandardItem* Qt = new QStandardItem(QStringLiteral("Qt"));
     Qt->setCheckable(true);
@@ -17,10 +23,9 @@ ComponentPage::ComponentPage(QWidget *parent) :
     model->appendRow(Qt);
     model->setItem(model->indexFromItem(Qt).row(),1,new QStandardItem(QStringLiteral("1.0.8")));
 
-    QVector<Qt_> all_qt;
-    all_qt.push_back({new QStandardItem(QStringLiteral("Qt 5.10.0")),new QStandardItem(QStringLiteral("5.10.0-0-32165165"))});
-    all_qt.push_back({new QStandardItem(QStringLiteral("Qt 5.11.0")),new QStandardItem(QStringLiteral("5.11.0-0-89498498"))});
-    all_qt.push_back({new QStandardItem(QStringLiteral("Tools")),new QStandardItem(QStringLiteral("1.0.8-0"))});
+    all_qt.push_back({new QStandardItem(QStringLiteral("Qt 5.10.0")),new QStandardItem(QStringLiteral("5.10.0-0-32165165")),new QVector<Qt_components>});
+    all_qt.push_back({new QStandardItem(QStringLiteral("Qt 5.11.0")),new QStandardItem(QStringLiteral("5.11.0-0-89498498")),new QVector<Qt_components>});
+    all_qt.push_back({new QStandardItem(QStringLiteral("Tools")),new QStandardItem(QStringLiteral("1.0.8-0")),new QVector<Qt_components>});
 
     for(Qt_ qt : all_qt)
     {
@@ -30,40 +35,69 @@ ComponentPage::ComponentPage(QWidget *parent) :
         Qt->appendRow(qt.name_qt);
         Qt->setChild(qt.name_qt->index().row(),1,qt.vers_qt);
 
-        qt.components.push_back({new QStandardItem(QStringLiteral("MSVC 2015 32-bit")),new QStandardItem(QStringLiteral("5.10.0-0-qadadw5"))});
-        qt.components.push_back({new QStandardItem(QStringLiteral("MSVC 2015 64-bit")),new QStandardItem(QStringLiteral("5.10.0-0-qadadw5"))});
+        Qt_components a;
+        a.name_com = new QStandardItem(QStringLiteral("MSVC 2015 32-bit"));
+        a.vers_com = new QStandardItem(QStringLiteral("5.10.0-0-qadadw5"));
+        a.url = QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreator.7z");
+        qt.components->push_back(a);
 
-        qt.components[0].name_com->setCheckable(true);
-        qt.components[1].name_com->setCheckable(true);
+        a.name_com = new QStandardItem(QStringLiteral("MSVC 2015 64-bit"));
+        a.vers_com = new QStandardItem(QStringLiteral("5.10.0-0-qadadw5"));
+        a.url = QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/10.0/10.0.1/installer_source/windows_x64/qtcreatorcdbext.7z");
+        qt.components->push_back(a);
 
-        qt.name_qt->appendRow(qt.components[0].name_com);
-        qt.name_qt->setChild(qt.components[0].name_com->index().row(),1,qt.components[0].vers_com);
+        qt.components->at(0).name_com->setCheckable(true);
+        qt.components->at(1).name_com->setCheckable(true);
 
-        qt.name_qt->appendRow(qt.components[1].name_com);
-        qt.name_qt->setChild(qt.components[1].name_com->index().row(),1,qt.components[1].vers_com);
+        qt.name_qt->appendRow(qt.components->at(0).name_com);
+        qt.name_qt->setChild(qt.components->at(0).name_com->index().row(),1,qt.components->at(0).vers_com);
+
+        qt.name_qt->appendRow(qt.components->at(1).name_com);
+        qt.name_qt->setChild(qt.components->at(1).name_com->index().row(),1,qt.components->at(1).vers_com);
     }
 
     connect ( model ,&QStandardItemModel::itemChanged , this ,&ComponentPage::treeItemChanged );
 
     ui->treeView->setModel(model);
 
-    connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&ComponentPage::s_nextPage);
+//    connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&ComponentPage::s_nextPage);
     connect(ui->buttonBox,&QDialogButtonBox::rejected,this,&ComponentPage::s_prevPage);
+    connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&ComponentPage::saveUrls);
 
-    manager = new QNetworkAccessManager();
-    QNetworkProxy proxy;
-    proxy.setType(QNetworkProxy::HttpProxy);
-    proxy.setHostName("proxy.olvs.miee.ru");
-    proxy.setPort(8080);
+    QString html;
 
-    manager->setProxy(proxy);
-    manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
+    const auto manager = new QNetworkAccessManager(this);
+//    connect(manager, &QNetworkAccessManager::finished,
+//            this, [](auto reply) {
+//                qDebug() << reply->readAll();
+//            });
 
-    reply = manager->get(QNetworkRequest(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/online/qtsdkrepository/windows_x86/desktop/qt5_5152/qt.qt5.5152.win32_msvc2019/")));
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://mirror.accum.se/mirror/qt.io/qtproject/official_releases/qtcreator/"));
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+
+    QNetworkReply *response = manager->get(request);
+
     QEventLoop event;
-    connect(reply,SIGNAL(finished()),&event,SLOT(quit()));
+    connect(response,SIGNAL(finished()),&event,SLOT(quit()));
     event.exec();
-    pageHTML(reply);
+    html = response->readAll();
+
+    QStringList list;
+
+    int pos = 0;
+    QRegExp rx("<a href=\"([^\"]+\\/)\"");
+
+    while ((pos = rx.indexIn(html, pos)) != -1) {
+        list << rx.cap(1);
+        pos += rx.matchedLength();
+    }
+
+    //Поиск href ссылок на странице , удаление дубликатов.
+    std::sort( list.begin(), list.end() );
+    list.erase(std::unique(list.begin(), list.end() ), list.end() );
+
+    qDebug() << list;
 }
 
 void ComponentPage::pageHTML(QNetworkReply *reply)
@@ -95,6 +129,24 @@ void ComponentPage::pageHTML(QNetworkReply *reply)
     }
     }
 
+}
+
+void ComponentPage::saveUrls()
+{
+    QVector<QUrl> urls;
+    for(Qt_ qt : all_qt)
+    {
+        for(size_t i = 0;i < qt.components->size();i++)
+        {
+            if(qt.components->at(i).name_com->checkState() == Qt::Checked)
+            {
+                urls.push_back(qt.components->at(i).url);
+            }
+        }
+    }
+    emit s_setUrls(urls);
+
+    emit s_nextPage();
 }
 
 Qt::CheckState ComponentPage::checkSibling(QStandardItem * item)
