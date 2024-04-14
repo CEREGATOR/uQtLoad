@@ -38,6 +38,9 @@ public:
     explicit ComponentPage(QWidget *parent = nullptr);
     ~ComponentPage();
 
+public slots:
+    void getHTML(QStringList list);
+
 signals:
     void s_nextPage();
     void s_prevPage();

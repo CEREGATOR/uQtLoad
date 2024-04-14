@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->componentWidget,&ComponentPage::s_setUrls,ui->saveWidget,&SavePage::setUrls);
 
-    ui->retranslateUi(this);
+    connect(ui->mirrorWidget,&MirrorSettings::s_setMirror,ui->componentWidget,&ComponentPage::getHTML);
 }
 
 
